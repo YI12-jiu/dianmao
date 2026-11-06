@@ -1,0 +1,11 @@
+node_modules/
+sync-service/data/
+dist/
+_shots/
+_ref/
+.DS_Store
+Thumbs.db
+*.log
+.workbuddy/
+*.genie
+_*.png

@@ -1,0 +1,16 @@
+{
+  "name": "点卯 · 课堂考勤工作台",
+  "short_name": "点卯",
+  "description": "老师点名、学生签到、考勤归档。离线可用，联网自动回传云端。",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#090e18",
+  "theme_color": "#090e18",
+  "icons": [
+    { "src": "./assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./assets/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

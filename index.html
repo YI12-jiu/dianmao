@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090e18">
+<meta name="description" content="点卯 · 课堂考勤工作台。老师端与学生端分离，离线可用，联网自动同步云端。">
+<title>点卯 · 登录</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon.svg">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+
+<main class="gate">
+  <!-- ---------- 左：品牌 ---------- -->
+  <section class="gate__brand">
+    <div class="lockup">
+      <div class="lockup__mark" aria-hidden="true">卯</div>
+      <div>
+        <div class="lockup__name">点卯</div>
+        <div class="lockup__sub">ATTENDANCE DESK</div>
+      </div>
+    </div>
+
+    <div class="gate__mid">
+      <span class="gate__eyebrow">课堂考勤工作台</span>
+      <h1 class="gate__title">卯时一点名<br><em>一课不落。</em></h1>
+      <p class="gate__lede">老师点名、学生签到、考勤归档，共用一个入口。断网照常记录，联网后自动回传云端。</p>
+      <div class="rollcall" id="rollcall" aria-hidden="true"></div>
+      <p class="rollcall-note">每一格亮起，就是一个到场的学生</p>
+    </div>
+
+    <div class="gate__facts">
+      <div class="gate__fact">
+        <b>离线可用</b>
+        <span>断网也能点名、查记录</span>
+      </div>
+      <div class="gate__fact">
+        <b>自动回传</b>
+        <span>写入本地，联网即同步</span>
+      </div>
+      <div class="gate__fact">
+        <b>双端分离</b>
+        <span>老师看全班，学生看自己</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 右：登录 ---------- -->
+  <section class="gate__panel">
+    <div class="gate__box">
+
+      <div class="resume" id="resume" hidden>
+        <div class="resume__who">
+          <span class="resume__avatar" id="resumeAvatar">王</span>
+          <div>
+            <b id="resumeName">王砚秋</b>
+            <span id="resumeMeta">老师 · 高一（3）班</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn--quiet btn--sm" id="resumeGo">继续进入</button>
+        <button type="button" class="resume__x" id="resumeDrop" aria-label="切换账号">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="gate__welcome rise">
+        <h2>欢迎回来</h2>
+        <p id="welcomeSub">请选择身份，再输入你的账号</p>
+      </div>
+
+      <div class="seg rise d1" id="seg" data-role="teacher" role="tablist" aria-label="选择身份">
+        <span class="seg__thumb" aria-hidden="true"></span>
+        <button type="button" class="seg__btn" data-role="teacher" role="tab" aria-selected="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>
+          老师端
+        </button>
+        <button type="button" class="seg__btn" data-role="student" role="tab" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5z"/><path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5"/></svg>
+          学生端
+        </button>
+      </div>
+
+      <form class="gate__form rise d2" id="loginForm" novalidate>
+        <div class="field" id="fAccount">
+          <input id="account" name="account" type="text" placeholder=" " autocomplete="username"
+                 autocapitalize="off" spellcheck="false" required>
+          <label for="account" id="accountLabel">工号 / 手机号</label>
+          <p class="field__hint" id="accountHint">请填写账号</p>
+        </div>
+
+        <div class="field" id="fPassword">
+          <input id="password" name="password" type="password" placeholder=" " autocomplete="current-password" required>
+          <label for="password">登录口令</label>
+          <button type="button" class="field__tail" id="togglePwd" aria-label="显示口令" aria-pressed="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+          </button>
+          <p class="field__hint" id="passwordHint">口令不正确</p>
+        </div>
+
+        <div class="gate__row">
+          <label class="check">
+            <input type="checkbox" id="remember" checked>
+            <span class="check__box">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#eed6a2" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+            </span>
+            <span>记住这台设备</span>
+          </label>
+          <button type="button" class="gate__link" id="forgot">忘记口令</button>
+        </div>
+
+        <div class="gate__err" id="gateErr" role="alert">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.4v.2"/></svg>
+          <span id="gateErrText"></span>
+        </div>
+
+        <button class="gate__submit" id="submit" type="submit">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="label" id="submitLabel">进入老师工作台</span>
+          <svg class="arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <div class="gate__or rise d3">首次使用或还没有账号</div>
+
+      <div class="gate__quick rise d4">
+        <button type="button" class="quick" data-demo="teacher">
+          <b>老师演示账号</b>
+          <span>t1001 / 123456</span>
+        </button>
+        <button type="button" class="quick" data-demo="student">
+          <b>学生演示账号</b>
+          <span>2026001 / 123456</span>
+        </button>
+      </div>
+
+      <div class="gate__foot rise d5">
+        <span class="net" id="netState"><span class="net__dot"></span><b>在线</b></span>
+        <span class="sep">/</span>
+        <span id="syncState">本地模式</span>
+        <span class="sep">/</span>
+        <button type="button" class="gate__link" id="joinClass" style="padding:0;border:0">用班级码加入</button>
+        <span class="sep">/</span>
+        <span id="verLine">v1.0.0</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 转场 -->
+<div class="wipe" id="wipe" aria-hidden="true">
+  <div class="wipe__inner">
+    <b>点 卯</b>
+    <span id="wipeText">正在进入工作台</span>
+  </div>
+</div>
+
+<!-- 忘记口令 -->
+<div class="scrim" id="forgotSheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
+    <h3 id="forgotTitle">重置登录口令</h3>
+    <p class="sub">离线状态也能重置：账号存在于这台设备时直接生效。设好后新口令会进入同步队列，联网时告诉老师。</p>
+    <div style="margin-top:18px">
+      <div class="field">
+        <input id="forgotAccount" type="text" placeholder=" " autocomplete="username">
+        <label for="forgotAccount">工号 / 学号</label>
+      </div>
+      <div class="field">
+        <input id="forgotPwd" type="password" placeholder=" " autocomplete="new-password">
+        <label for="forgotPwd">新口令（至少 6 位）</label>
+      </div>
+      <div class="field">
+        <input id="forgotPwd2" type="password" placeholder=" " autocomplete="new-password">
+        <label for="forgotPwd2">再输一次</label>
+      </div>
+    </div>
+    <p class="sub" id="forgotMsg" style="margin-top:12px;color:var(--bad);display:none"></p>
+    <div class="sheet__foot">
+      <button type="button" class="btn btn--quiet" data-close="forgotSheet">取消</button>
+      <button type="button" class="btn btn--primary" id="forgotDo">确认重置</button>
+    </div>
+  </div>
+</div>
+
+<!-- 班级码加入 -->
+<div class="scrim" id="joinSheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="joinTitle">
+    <h3 id="joinTitle">用班级码加入</h3>
+    <p class="sub">向班主任要 6 位班级码。加入后会以学生身份登录，只看到自己的考勤。</p>
+    <div style="margin-top:18px">
+      <div class="field">
+        <input id="joinCode" type="text" inputmode="numeric" maxlength="6" placeholder=" " autocomplete="off">
+        <label for="joinCode">班级码（演示：880123）</label>
+      </div>
+      <div class="field">
+        <input id="joinName" type="text" placeholder=" " autocomplete="off">
+        <label for="joinName">真实姓名</label>
+      </div>
+      <div class="field">
+        <input id="joinNo" type="text" inputmode="numeric" placeholder=" " autocomplete="off">
+        <label for="joinNo">学号</label>
+      </div>
+      <div class="field">
+        <input id="joinPwd" type="password" placeholder=" " autocomplete="new-password">
+        <label for="joinPwd">设置口令（至少 6 位）</label>
+      </div>
+    </div>
+    <p class="sub" id="joinMsg" style="margin-top:12px;color:var(--bad);display:none"></p>
+    <div class="sheet__foot">
+      <button type="button" class="btn btn--quiet" data-close="joinSheet">取消</button>
+      <button type="button" class="btn btn--primary" id="joinDo">加入并登录</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/cloud.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>

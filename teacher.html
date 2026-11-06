@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090e18">
+<title>老师工作台 · 点卯</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topbar__brand">
+      <div class="topbar__mark" aria-hidden="true">卯</div>
+      <div class="topbar__name">点卯</div>
+    </div>
+    <div class="topbar__where">
+      <b id="className">高一（3）班</b>
+      <span id="classMeta">语文 · 880123</span>
+    </div>
+
+    <nav class="nav" aria-label="主导航">
+      <button type="button" class="nav__btn on" data-page="attend">点名</button>
+      <button type="button" class="nav__btn" data-page="stats">统计</button>
+      <button type="button" class="nav__btn" data-page="roster">学生</button>
+      <button type="button" class="nav__btn" data-page="set">设置</button>
+    </nav>
+
+    <div class="topbar__right">
+      <span id="syncHost" style="display:flex"></span>
+      <div class="me">
+        <div class="me__avatar" id="meAvatar">王</div>
+        <span class="me__name" id="meName">王砚秋</span>
+      </div>
+      <button type="button" class="icon-btn" id="logout" title="退出登录" aria-label="退出登录">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h9"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ 点名 ============ -->
+  <main class="page" id="page-attend">
+    <div class="lead">
+      <div>
+        <h1 id="greeting">早上好，王老师</h1>
+        <p id="todayLine">今天是 11 月 7 日 周五 · 第 1 节 语文 · 古诗文精读</p>
+      </div>
+      <div class="lead__act">
+        <button type="button" class="btn btn--quiet btn--sm" id="allPresent">全部到场</button>
+        <button type="button" class="btn btn--quiet btn--sm" id="clearAll">清空</button>
+        <button type="button" class="btn btn--primary btn--sm" id="saveAttend">保存点名</button>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi kpi--hero"><span>出勤率</span><b id="kRate">—</b></div>
+      <div class="kpi"><span>应到</span><b id="kTotal">0</b></div>
+      <div class="kpi"><span>已到</span><b id="kPresent">0</b></div>
+      <div class="kpi"><span>未点名</span><b id="kPending">0</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <div>
+          <h2>点名册</h2>
+          <div class="sub" id="attendSub">选择日期与节次，逐个标记</div>
+        </div>
+        <div class="toolbar">
+          <input type="date" class="inp" id="date" aria-label="上课日期">
+          <select class="inp" id="slot" aria-label="节次"></select>
+          <input type="search" class="inp" id="q" placeholder="姓名 / 学号" aria-label="搜索学生" style="width:150px">
+        </div>
+      </div>
+      <div class="rows" id="stuList"></div>
+      <div class="card__ft">
+        <span class="chip" id="saveState">未保存</span>
+        <span style="flex:1"></span>
+        <button type="button" class="btn btn--primary" id="saveAttend2">保存点名</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ 统计 ============ -->
+  <main class="page" id="page-stats" hidden>
+    <div class="lead">
+      <div>
+        <h1>考勤统计</h1>
+        <p>基于本机已有记录，离线也能看</p>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi kpi--hero"><span>累计出勤率</span><b id="sRate">—</b></div>
+      <div class="kpi"><span>记录场次</span><b id="sSessions">0</b></div>
+      <div class="kpi"><span>缺勤人次</span><b id="sAbsent">0</b></div>
+      <div class="kpi"><span>迟到人次</span><b id="sLate">0</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <div>
+          <h2>最近 7 次出勤率</h2>
+          <div class="sub">按场次从早到晚</div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--gold-500)"></i>出勤率</span>
+        </div>
+      </div>
+      <div class="card__bd">
+        <div class="chart" id="chart"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd"><div><h2>学生出勤明细</h2><div class="sub">点击「查看」可跳到该生记录</div></div></div>
+      <div class="rows" id="statRows"></div>
+    </div>
+  </main>
+
+  <!-- ============ 学生 ============ -->
+  <main class="page" id="page-roster" hidden>
+    <div class="lead">
+      <div>
+        <h1>学生名单</h1>
+        <p>共 <b id="rosterCount">0</b> 人 · 新增学生会同时写入云端队列</p>
+      </div>
+      <div class="lead__act">
+        <input class="inp" id="newName" placeholder="姓名" style="width:110px">
+        <input class="inp" id="newNo" placeholder="学号" style="width:130px">
+        <button type="button" class="btn btn--primary btn--sm" id="addStu">添加学生</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <div><h2>名单</h2><div class="sub">初始口令统一为 123456，可让学生自行修改</div></div>
+        <input type="search" class="inp" id="rosterQ" placeholder="搜索" aria-label="搜索学生" style="width:150px">
+      </div>
+      <div class="rows" id="rosterList"></div>
+    </div>
+  </main>
+
+  <!-- ============ 设置 ============ -->
+  <main class="page" id="page-set" hidden>
+    <div class="lead">
+      <div>
+        <h1>设置</h1>
+        <p>数据先存本机，联网后回传云端</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <div>
+          <h2>云端同步</h2>
+          <div class="sub">填上你的接口地址即可启用；留空则一直使用本地存储</div>
+        </div>
+        <span class="chip chip--gold" id="cloudMode">本地模式</span>
+      </div>
+      <div class="card__bd">
+        <div class="setrow">
+          <div class="setrow__lb">
+            <b>接口地址</b>
+            <span>例如 https://your-host/api/attendance，不带斜杠结尾</span>
+          </div>
+          <input class="inp" id="endpoint" placeholder="https://…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="setrow">
+          <div class="setrow__lb">
+            <b>访问令牌（可选）</b>
+            <span>会作为 Authorization: Bearer 头发送</span>
+          </div>
+          <input class="inp" id="token" type="password" placeholder="可选" autocomplete="off">
+        </div>
+        <div class="setrow">
+          <div class="setrow__lb">
+            <b>同步状态</b>
+            <span id="cloudDetail">尚未配置接口，所有记录只保存在这台设备</span>
+          </div>
+          <div class="toolbar">
+            <button type="button" class="btn btn--quiet btn--sm" id="testCloud">测试连接</button>
+            <button type="button" class="btn btn--quiet btn--sm" id="flushNow">立即同步</button>
+            <button type="button" class="btn btn--primary btn--sm" id="saveCloud">保存</button>
+          </div>
+        </div>
+        <div class="setrow">
+          <div class="setrow__lb">
+            <b>待回传队列</b>
+            <span>断网期间的操作会排队，联网自动推送</span>
+          </div>
+          <div class="toolbar">
+            <span class="chip" id="queueCount">0 条</span>
+            <button type="button" class="btn btn--quiet btn--sm" id="showQueue">查看</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd"><div><h2>数据与设备</h2><div class="sub">本机数据可导出备份，换设备时导入</div></div></div>
+      <div class="card__bd">
+        <div class="setrow">
+          <div class="setrow__lb"><b>导出备份</b><span>下载一个 JSON 文件，包含名单与全部考勤记录</span></div>
+          <div class="toolbar"><button type="button" class="btn btn--quiet btn--sm" id="exportBtn">导出 JSON</button></div>
+        </div>
+        <div class="setrow">
+          <div class="setrow__lb"><b>安装到桌面</b><span>首次打开后可从浏览器菜单「添加到主屏幕」，离线也能直接进入</span></div>
+          <div class="toolbar"><span class="chip" id="swState">检测中…</span></div>
+        </div>
+        <div class="setrow">
+          <div class="setrow__lb"><b>清空本机数据</b><span>会删除这台设备上的全部账号与记录，已同步到云端的记录不受影响</span></div>
+          <div class="toolbar"><button type="button" class="btn btn--quiet btn--sm" id="wipeBtn" style="color:var(--bad)">清空并退出</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__bd" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="font-size:12.5px;color:var(--muted)">点卯 · 课堂考勤工作台 <span id="verTxt"></span></div>
+        <button type="button" class="btn btn--quiet btn--sm" id="logout2">退出登录</button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="底部导航">
+    <button type="button" class="on" data-page="attend">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11.5 14 15.5 9"/><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4"/></svg>
+      点名
+    </button>
+    <button type="button" data-page="stats">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+      统计
+    </button>
+    <button type="button" data-page="roster">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M16.5 5.6a3 3 0 0 1 0 5.8M18 14.8c2 .7 3 2.3 3 4.2"/></svg>
+      学生
+    </button>
+    <button type="button" data-page="set">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 2.6 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.6a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9 2 2 0 1 1 0 4 1.7 1.7 0 0 0-1.5.9Z"/></svg>
+      设置
+    </button>
+  </nav>
+</div>
+
+<div class="scrim" id="queueSheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="qTitle">
+    <h3 id="qTitle">待回传队列</h3>
+    <p class="sub">这些操作已经保存在本机，联网后会按顺序推送到云端。</p>
+    <div id="queueBody" style="margin-top:14px;max-height:44vh;overflow:auto"></div>
+    <div class="sheet__foot">
+      <button type="button" class="btn btn--quiet" data-close="queueSheet">关闭</button>
+      <button type="button" class="btn btn--primary" id="queueSync">立即同步</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/cloud.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/teacher.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090e18">
+<title>我的考勤 · 点卯</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="topbar__brand">
+      <div class="topbar__mark" aria-hidden="true">卯</div>
+      <div class="topbar__name">点卯</div>
+    </div>
+    <div class="topbar__where">
+      <b id="className">高一（3）班</b>
+      <span id="classMeta">学生端</span>
+    </div>
+
+    <nav class="nav" aria-label="主导航">
+      <button type="button" class="nav__btn on" data-page="home">签到</button>
+      <button type="button" class="nav__btn" data-page="records">我的记录</button>
+      <button type="button" class="nav__btn" data-page="timetable">课表</button>
+    </nav>
+
+    <div class="topbar__right">
+      <span id="syncHost" style="display:flex"></span>
+      <div class="me">
+        <div class="me__avatar" id="meAvatar">林</div>
+        <span class="me__name" id="meName">林知远</span>
+      </div>
+      <button type="button" class="icon-btn" id="logout" title="退出登录" aria-label="退出登录">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H15"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h9"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ 签到 ============ -->
+  <main class="page" id="page-home">
+    <div class="lead">
+      <div>
+        <h1 id="greeting">早上好，林知远</h1>
+        <p id="todayLine">今天是 11 月 7 日</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__bd">
+        <div class="ring-wrap">
+          <div class="ring" id="ring" style="--p:0">
+            <div class="ring__inner"><b id="ringVal">—</b><span>本学期出勤率</span></div>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+              <span class="chip chip--ok" id="chipStreak"><span class="chip__dot"></span>连续到场 0 次</span>
+              <span class="chip" id="chipAbsent">缺勤 0 次</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--muted);line-height:1.7" id="ringHint">
+              记录来自老师在课上保存的点名结果，也会记下你自己的签到。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd">
+        <div>
+          <h2>今日签到</h2>
+          <div class="sub" id="checkSub">找到今天的课，点一下就算到场</div>
+        </div>
+        <span class="chip" id="checkState">未签到</span>
+      </div>
+      <div class="card__bd">
+        <div class="toolbar" style="align-items:stretch">
+          <select class="inp" id="checkSlot" style="flex:1 1 160px;height:52px" aria-label="选择节次"></select>
+          <button type="button" class="btn btn--primary" id="checkBtn" style="height:52px;flex:1 1 200px">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+            我到了，签到
+          </button>
+        </div>
+        <div style="margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.7" id="checkNote">
+          签到会立刻写入本机，断网也不丢；联网后自动同步给老师。
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd"><div><h2>今日课程</h2><div class="sub">按课表自动排出的顺序</div></div></div>
+      <div class="card__bd" id="todayCourses"></div>
+    </div>
+  </main>
+
+  <!-- ============ 我的记录 ============ -->
+  <main class="page" id="page-records" hidden>
+    <div class="lead">
+      <div>
+        <h1>我的记录</h1>
+        <p>这里只有你自己的考勤记录</p>
+      </div>
+      <div class="lead__act">
+        <select class="inp" id="monthFilter" aria-label="按月筛选"></select>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi kpi--hero"><span>出勤率</span><b id="rRate">—</b></div>
+      <div class="kpi"><span>到场</span><b id="rPresent">0</b></div>
+      <div class="kpi"><span>缺勤</span><b id="rAbsent">0</b></div>
+      <div class="kpi"><span>迟到 / 请假</span><b id="rOther">0</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card__hd"><div><h2>明细</h2><div class="sub" id="recSub">全部记录</div></div></div>
+      <div class="card__bd" id="recordList"></div>
+    </div>
+  </main>
+
+  <!-- ============ 课表 ============ -->
+  <main class="page" id="page-timetable" hidden>
+    <div class="lead">
+      <div>
+        <h1>课表</h1>
+        <p>老师排好的课，签到按这里来</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__bd" id="timetable"></div>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="底部导航">
+    <button type="button" class="on" data-page="home">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+      签到
+    </button>
+    <button type="button" data-page="records">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      记录
+    </button>
+    <button type="button" data-page="timetable">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M3.5 10h17"/></svg>
+      课表
+    </button>
+  </nav>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/db.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/cloud.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/student.js"></script>
+</body>
+</html>
